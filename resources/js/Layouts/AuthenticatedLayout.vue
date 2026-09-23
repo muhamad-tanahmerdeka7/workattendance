@@ -5,8 +5,12 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import { Link } from "@inertiajs/vue3";
+import { usePermission } from "@/Composables/usePermission";
 
 const showingSidebar = ref(true);
+
+// Inisialisasi fungsi pengecekan hak akses
+const { hasPermission } = usePermission();
 </script>
 
 <template>
@@ -21,7 +25,6 @@ const showingSidebar = ref(true);
                 <div
                     class="h-16 flex items-center justify-between px-4 border-b border-gray-100"
                 >
-                    <!-- Logo & Nama Aplikasi (Hanya tampil saat sidebar terbuka) -->
                     <Link
                         v-if="showingSidebar"
                         :href="route('dashboard')"
@@ -37,7 +40,6 @@ const showingSidebar = ref(true);
                         </span>
                     </Link>
 
-                    <!-- Toggle Sidebar Button (Rata tengah saat sidebar mengecil) -->
                     <button
                         @click="showingSidebar = !showingSidebar"
                         :class="showingSidebar ? '' : 'mx-auto'"
@@ -59,8 +61,9 @@ const showingSidebar = ref(true);
                     </button>
                 </div>
 
-                <!-- Navigation Links (Samping) -->
+                <!-- Navigation Links -->
                 <nav class="p-4 space-y-2">
+                    <!-- Dashboard (Dapat diakses Karyawan & Line Head) -->
                     <NavLink
                         :href="route('dashboard')"
                         :active="route().current('dashboard')"
@@ -84,6 +87,7 @@ const showingSidebar = ref(true);
                         >
                     </NavLink>
 
+                    <!-- Presensi Saya (Dapat diakses Karyawan & Line Head) -->
                     <NavLink
                         :href="route('attendance.index')"
                         :active="route().current('attendance.index')"
@@ -107,7 +111,9 @@ const showingSidebar = ref(true);
                         >
                     </NavLink>
 
+                    <!-- Monitoring Tim (KHUSUS LINE HEAD / Punya Permission 'view all attendance') -->
                     <NavLink
+                        v-if="hasPermission('view all attendance')"
                         :href="route('attendance.monitoring')"
                         :active="route().current('attendance.monitoring')"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition"
@@ -130,6 +136,7 @@ const showingSidebar = ref(true);
                         >
                     </NavLink>
 
+                    <!-- Izin & Sakit (Dapat diakses Karyawan & Line Head) -->
                     <NavLink
                         :href="route('leave.index')"
                         :active="route().current('leave.index')"
@@ -153,7 +160,9 @@ const showingSidebar = ref(true);
                         >
                     </NavLink>
 
+                    <!-- Kelola Karyawan (KHUSUS LINE HEAD / Punya Permission 'manage employees') -->
                     <NavLink
+                        v-if="hasPermission('manage employees')"
                         :href="route('employees.index')"
                         :active="route().current('employees.*')"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition"
@@ -187,18 +196,18 @@ const showingSidebar = ref(true);
                             class="flex items-center gap-3 w-full text-left p-2 rounded-lg hover:bg-gray-100 transition"
                         >
                             <div
-                                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0"
+                                class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 uppercase"
                             >
-                                {{ $page.props.auth.user.name.charAt(0) }}
+                                {{ $page.props.auth.user?.name ? $page.props.auth.user.name.charAt(0) : 'U' }}
                             </div>
                             <div v-if="showingSidebar" class="overflow-hidden">
                                 <p
                                     class="text-sm font-semibold text-gray-800 truncate"
                                 >
-                                    {{ $page.props.auth.user.name }}
+                                    {{ $page.props.auth.user?.name }}
                                 </p>
                                 <p class="text-xs text-gray-500 truncate">
-                                    {{ $page.props.auth.user.email }}
+                                    {{ $page.props.auth.user?.email }}
                                 </p>
                             </div>
                         </button>
@@ -222,7 +231,6 @@ const showingSidebar = ref(true);
 
         <!-- AREA KONTEN UTAMA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <!-- Header Atas (Judul Halaman) -->
             <header
                 class="bg-white shadow-sm h-16 flex items-center px-6"
                 v-if="$slots.header"
@@ -230,7 +238,6 @@ const showingSidebar = ref(true);
                 <slot name="header" />
             </header>
 
-            <!-- Main Body Content -->
             <main class="flex-1 overflow-y-auto">
                 <slot />
             </main>

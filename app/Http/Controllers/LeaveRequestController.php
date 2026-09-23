@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LeaveRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,23 +13,25 @@ class LeaveRequestController extends Controller
     {
         $user = $request->user();
 
-        // Mengambil pengajuan sesuai role
-        if ($user->hasRole('Line Head')) {
-            $leaves = LeaveRequest::with('user')
-                ->whereHas('user', function ($q) use ($user) {
-                    $q->where('line_head_id', $user->id);
-                })
-                ->orderBy('created_at', 'desc')
+        // Jika Line Head, tampilkan semua pengajuan dari bawahannya (termasuk dirinya)
+        if ($user->can('approve leave request') || $user->hasRole('Line Head')) {
+            $teamUserIds = User::where('line_head_id', $user->id)->pluck('id');
+            $allIds = $teamUserIds->push($user->id);
+
+            $leaveRequests = LeaveRequest::with('user')
+                ->whereIn('user_id', $allIds)
+                ->latest()
                 ->get();
         } else {
-            $leaves = LeaveRequest::with('user')
+            // Jika Karyawan Biasa, hanya tampilkan pengajuan miliknya sendiri
+            $leaveRequests = LeaveRequest::with('user')
                 ->where('user_id', $user->id)
-                ->orderBy('created_at', 'desc')
+                ->latest()
                 ->get();
         }
 
         return Inertia::render('Leave/Index', [
-            'leaves' => $leaves ?? [],
+            'leaveRequests' => $leaveRequests,
         ]);
     }
 
@@ -41,25 +44,26 @@ class LeaveRequestController extends Controller
             'reason' => 'required|string',
         ]);
 
-        $request->user()->leaveRequests()->create($validated);
+        $request->user()->leaveRequests()->create([
+            'type' => $validated['type'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'reason' => $validated['reason'],
+            'status' => 'pending',
+        ]);
 
-        return back()->with('success', 'Pengajuan berhasil dikirim.');
+        return redirect()->route('leave.index')->with('success', 'Pengajuan berhasil dikirim.');
     }
 
     public function approve(Request $request, $id)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'rejection_note' => 'nullable|string',
-        ]);
+        $leaveRequest = LeaveRequest::findOrFail($id);
 
-        $leave = LeaveRequest::findOrFail($id);
-        $leave->update([
-            'status' => $validated['status'],
-            'rejection_note' => $validated['rejection_note'] ?? null,
+        $leaveRequest->update([
+            'status' => 'approved',
             'approved_by' => $request->user()->id,
         ]);
 
-        return back()->with('success', 'Status pengajuan berhasil diperbarui.');
+        return redirect()->route('leave.index')->with('success', 'Pengajuan berhasil disetujui.');
     }
 }

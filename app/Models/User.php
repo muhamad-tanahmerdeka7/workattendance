@@ -58,4 +58,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(OvertimeRequest::class);
     }
+
+    // Relasi ke Plotting Shift Karyawan
+    public function employeeShifts()
+    {
+        return $this->hasMany(EmployeeShift::class);
+    }
 }

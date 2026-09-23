@@ -6,17 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Attendance extends Model
+class EmployeeShift extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'shift_id', // Ditambahkan untuk mendukung multi-shift & shift pengganti
+        'shift_id',
         'date',
-        'time_in',
-        'time_out',
-        'status',
+        'assigned_by',
         'notes',
     ];
 
@@ -28,5 +26,10 @@ class Attendance extends Model
     public function shift(): BelongsTo
     {
         return $this->belongsTo(Shift::class);
+    }
+
+    public function assigner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_by');
     }
 }
