@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
-
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
@@ -76,7 +75,8 @@ class AttendanceController extends Controller
         $user = $request->user();
 
         // Line Head melihat presensi bawahan
-        $teamAttendances = Attendance::with('user')
+        // PERBAIKAN: Menambahkan 'user.employee' agar relasi ke tabel Employee (NIK) ikut dipanggil
+        $teamAttendances = Attendance::with('user.employee')
             ->whereHas('user', function ($query) use ($user) {
                 $query->where('line_head_id', $user->id);
             })
