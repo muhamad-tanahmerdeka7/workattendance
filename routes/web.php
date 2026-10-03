@@ -6,6 +6,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\OvertimeRequestController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalaryController; // <-- TAMBAHAN UNTUK MODUL GAJI
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -57,6 +58,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/overtime', [OvertimeRequestController::class, 'store'])
         ->middleware('permission:create overtime request')
         ->name('overtime.store');
+
+
+    // ==========================================
+    // MODUL GAJI & KOMPLAIN KARYAWAN
+    // ==========================================
+    Route::get('/salaries', [SalaryController::class, 'index'])->name('salaries.index');
+    Route::post('/salaries', [SalaryController::class, 'store'])->name('salaries.store');
+    Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])->name('salaries.destroy');
+    Route::post('/salaries/{salary}/complain', [SalaryController::class, 'complain'])->name('salaries.complain');
 
 
     // ==========================================

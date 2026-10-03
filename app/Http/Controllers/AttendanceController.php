@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class AttendanceController extends Controller
 {
@@ -18,6 +18,7 @@ class AttendanceController extends Controller
             ->where('date', $today)
             ->first();
 
+        // Diperbarui agar riwayat presensi pribadi urut dari tanggal terbaru ke terlama
         $attendances = Attendance::where('user_id', $user->id)
             ->orderBy('date', 'desc')
             ->get();
@@ -75,7 +76,7 @@ class AttendanceController extends Controller
         $user = $request->user();
 
         // Line Head melihat presensi bawahan
-        // PERBAIKAN: Menambahkan 'user.employee' agar relasi ke tabel Employee (NIK) ikut dipanggil
+        // Menambahkan 'user.employee' agar relasi ke tabel Employee (NIK) ikut dipanggil
         $teamAttendances = Attendance::with('user.employee')
             ->whereHas('user', function ($query) use ($user) {
                 $query->where('line_head_id', $user->id);

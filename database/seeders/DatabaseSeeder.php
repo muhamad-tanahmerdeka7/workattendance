@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleAndPermissionSeeder::class,
             ShiftSeeder::class, // <-- Seeder Shift dipanggil terpisah
+            SalarySeeder::class,
         ]);
     }
 }
