@@ -6,10 +6,9 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\OvertimeRequestController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SalaryController; // <-- TAMBAHAN UNTUK MODUL GAJI
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\ShiftController; // <-- TAMBAHAN UNTUK MODUL SHIFT KERJA
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 // Mengarahkan domain utama langsung ke halaman Login
 Route::get('/', function () {
@@ -42,9 +41,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('attendance.checkOut');
 
     // 2. Modul Izin & Sakit (Pengajuan)
-    Route::get('/leave', [LeaveRequestController::class, 'index'])
+    Route::get('/leave', [LeaveRequestController::class, 'indexPermissionSick'])
         ->middleware('permission:view leave request')
         ->name('leave.index');
+
+    // 2b. Modul Cuti & Dispensasi (Menu Baru)
+    Route::get('/leave-dispensation', [LeaveRequestController::class, 'indexLeaveDispensation'])
+        ->middleware('permission:view leave request')
+        ->name('leave.dispensation.index');
 
     Route::post('/leave', [LeaveRequestController::class, 'store'])
         ->middleware('permission:create leave request')
@@ -59,7 +63,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:create overtime request')
         ->name('overtime.store');
 
-
     // ==========================================
     // MODUL GAJI & KOMPLAIN KARYAWAN
     // ==========================================
@@ -67,7 +70,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/salaries', [SalaryController::class, 'store'])->name('salaries.store');
     Route::delete('/salaries/{salary}', [SalaryController::class, 'destroy'])->name('salaries.destroy');
     Route::post('/salaries/{salary}/complain', [SalaryController::class, 'complain'])->name('salaries.complain');
-
 
     // ==========================================
     // FITUR KHUSUS (LINE HEAD ONLY)
@@ -78,10 +80,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('permission:view all attendance')
         ->name('attendance.monitoring');
 
-    // Persetujuan Izin & Lembur
+    // Persetujuan Izin, Cuti & Lembur
     Route::post('/leave/{id}/approve', [LeaveRequestController::class, 'approve'])
         ->middleware('permission:approve leave request')
         ->name('leave.approve');
+
+    // Penolakan Izin & Cuti (Reject)
+    Route::post('/leave/{id}/reject', [LeaveRequestController::class, 'reject'])
+        ->middleware('permission:approve leave request')
+        ->name('leave.reject');
 
     Route::post('/overtime/{id}/approve', [OvertimeRequestController::class, 'approve'])
         ->middleware('permission:approve overtime request')
@@ -90,6 +97,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Kelola Data Karyawan
     Route::resource('employees', EmployeeController::class)
         ->middleware('permission:manage employees');
+
+    // Manajemen Shift Kerja (Drag & Drop)
+    Route::get('/shifts', [ShiftController::class, 'index'])->name('shifts.index');
+    Route::post('/shifts/assign', [ShiftController::class, 'assign'])->name('shifts.assign');
+
+    // -- RUTE EKSPOR LAPORAN REKAP SHIFT BULANAN --
+    Route::get('/shifts/export', [ShiftController::class, 'export'])->name('shifts.export');
+    Route::get('/shifts/export-pdf', [ShiftController::class, 'exportPdf'])->name('shifts.exportPdf');
+
+    // -- RUTE MATRIKS JADWAL TIM & EKSPORNYA (EXCEL & PDF) --
+    Route::get('/shifts/schedule', [ShiftController::class, 'schedule'])->name('shifts.schedule');
+    Route::get('/shifts/schedule/export', [ShiftController::class, 'exportSchedule'])->name('shifts.schedule.export');
+    Route::get('/shifts/schedule/export-pdf', [ShiftController::class, 'exportSchedulePdf'])->name('shifts.schedule.exportPdf');
 });
 
 // Group Route Profil bawaan Laravel Breeze

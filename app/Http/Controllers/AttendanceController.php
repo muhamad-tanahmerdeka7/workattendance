@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\EmployeeShift;
+use App\Models\Shift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -23,9 +25,31 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
+        // TAMBAHAN: Mengambil data shift/jadwal libur karyawan yang sedang login untuk hari ini
+        $myShift = EmployeeShift::with('shift')
+            ->where('user_id', $user->id)
+            ->where('date', $today)
+            ->first();
+
+        // Khusus HR Manager: otomatis menggunakan Shift Pagi default jika belum di-plot
+        if (!$myShift && $user->hasRole('HR Manager')) {
+            $morningShift = Shift::where('name', 'Pagi')->first() ?? (object) [
+                'name' => 'Pagi',
+                'start_time' => '08:00:00',
+                'end_time' => '17:00:00',
+                'is_flexible' => false,
+            ];
+
+            $myShift = (object) [
+                'shift' => $morningShift,
+                'is_off' => false,
+            ];
+        }
+
         return Inertia::render('Attendance/Index', [
             'todayAttendance' => $todayAttendance,
             'attendances' => $attendances,
+            'myShift' => $myShift, // <-- Dikirim ke halaman Vue karyawan
         ]);
     }
 

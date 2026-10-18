@@ -12,10 +12,10 @@ class RoleAndPermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Reset cache permission Spatie
+        // 1. Reset cache permission Spatie
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        // 1. Daftar seluruh permission aplikasi
+        // 2. Daftar seluruh permission aplikasi
         $permissions = [
             'view dashboard',
             'view attendance',
@@ -30,16 +30,38 @@ class RoleAndPermissionSeeder extends Seeder
             'view overtime request',
             'approve overtime request',
             'manage employees',
+            'manage shifts',        // Mengatur master shift & plotting jadwal
+            'manage roles',         // Mengatur role & permission
+            'manage user accounts', // Membuat akun & menentukan hierarki line head
         ];
 
         foreach ($permissions as $perm) {
             Permission::firstOrCreate(['name' => $perm]);
         }
 
-        // 2. Role Karyawan (Hanya akses presensi, izin, lembur milik sendiri)
+        // 3. Role HR Manager / Super Admin (Akses Penuh Seluruh Sistem)
+        $hrRole = Role::firstOrCreate(['name' => 'HR Manager']);
+        $hrRole->syncPermissions(Permission::all());
+
+        // 4. Role Line Head (Mengelola presensi, shift tim, dan approval bawahan)
+        $lineHeadRole = Role::firstOrCreate(['name' => 'Line Head']);
+        $lineHeadRole->syncPermissions([
+            'view dashboard',
+            'view attendance',
+            'view own attendance',
+            'create attendance',
+            'view all attendance',
+            'view leave request',
+            'approve leave request',
+            'view overtime request',
+            'approve overtime request',
+            'manage shifts',
+        ]);
+
+        // 5. Role Karyawan (Hanya akses mandiri)
         $karyawanRole = Role::firstOrCreate(['name' => 'Karyawan']);
         $karyawanRole->syncPermissions([
-            'view dashboard',         // Ditambahkan agar karyawan bisa akses dashboard utama
+            'view dashboard',
             'view own attendance',
             'create attendance',
             'create leave request',
@@ -48,22 +70,28 @@ class RoleAndPermissionSeeder extends Seeder
             'view overtime request',
         ]);
 
-        // 3. Role Line Head (Akses seluruh fitur)
-        $lineHeadRole = Role::firstOrCreate(['name' => 'Line Head']);
-        $lineHeadRole->syncPermissions(Permission::all());
+        // 6. Akun HR Manager (Muhamad)
+        $admin = User::updateOrCreate(
+            ['email' => 'muhamad@gmail.com'],
+            [
+                'name' => 'Muhamad S.Kom',
+                'password' => bcrypt('password'),
+            ]
+        );
+        $admin->syncRoles([$hrRole]);
 
-        // 4. Dummy Line Head
-        $head = User::firstOrCreate(
+        // 7. Akun Dummy Line Head
+        $head = User::updateOrCreate(
             ['email' => 'head@example.com'],
             [
                 'name' => 'Line Head Demo',
                 'password' => bcrypt('password'),
             ]
         );
-        $head->assignRole($lineHeadRole);
+        $head->syncRoles([$lineHeadRole]);
 
-        // 5. Dummy Karyawan
-        $karyawan = User::firstOrCreate(
+        // 8. Akun Dummy Karyawan
+        $karyawan = User::updateOrCreate(
             ['email' => 'karyawan@example.com'],
             [
                 'name' => 'Karyawan Demo',
@@ -71,6 +99,6 @@ class RoleAndPermissionSeeder extends Seeder
                 'line_head_id' => $head->id,
             ]
         );
-        $karyawan->assignRole($karyawanRole);
+        $karyawan->syncRoles([$karyawanRole]);
     }
 }

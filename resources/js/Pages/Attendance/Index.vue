@@ -6,6 +6,7 @@ import { usePermission } from "@/Composables/usePermission";
 const props = defineProps({
     todayAttendance: Object,
     attendances: Array,
+    myShift: Object, // <-- PENERIMA DATA SHIFT DARI CONTROLLER
 });
 
 const user = usePage().props.auth.user;
@@ -37,6 +38,36 @@ const submitCheckOut = () => {
         <!-- 1. TAMPILAN DESKTOP (Hanya Muncul di Laptop/PC) -->
         <!-- ========================================== -->
         <div class="hidden md:block py-12 max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <!-- 🌟 KARTU INFORMASI SHIFT DESKTOP -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Jadwal Shift Anda Hari Ini</p>
+                        <h3 class="text-base font-bold text-slate-800 mt-0.5">
+                            <span v-if="props.myShift">
+                                {{ props.myShift.shift_id ? props.myShift.shift.name : 'Hari Libur (Off)' }}
+                                <span v-if="props.myShift.shift_id" class="text-xs font-normal text-blue-600 ml-1.5 bg-blue-50 px-2 py-0.5 rounded-md font-mono">
+                                    ({{ props.myShift.shift.start_time.substring(0,5) }} - {{ props.myShift.shift.end_time.substring(0,5) }})
+                                </span>
+                            </span>
+                            <span v-else class="text-amber-600 text-sm font-semibold">Belum ditentukan oleh Atasan</span>
+                        </h3>
+                    </div>
+                </div>
+                <div>
+                    <span class="px-3.5 py-1.5 text-xs font-bold rounded-xl"
+                        :class="props.myShift ? (props.myShift.shift_id ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700') : 'bg-amber-100 text-amber-700'">
+                        {{ props.myShift ? (props.myShift.shift_id ? 'Jadwal Masuk' : 'Libur Terjadwal') : 'Menunggu Plotting' }}
+                    </span>
+                </div>
+            </div>
+
             <!-- Card Absen Hari Ini Desktop -->
             <div
                 v-if="hasPermission('create attendance')"
@@ -183,6 +214,31 @@ const submitCheckOut = () => {
         <!-- 2. TAMPILAN MOBILE (Hanya Muncul di Layar Smartphone) -->
         <!-- ========================================== -->
         <div class="block md:hidden p-4 space-y-4">
+
+            <!-- 🌟 KARTU INFORMASI SHIFT MOBILE -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Shift Hari Ini</p>
+                        <h3 class="text-xs font-bold text-slate-800 mt-0.5">
+                            <span v-if="props.myShift">
+                                {{ props.myShift.shift_id ? props.myShift.shift.name : 'Hari Libur (Off)' }}
+                            </span>
+                            <span v-else class="text-amber-600">Belum diatur</span>
+                        </h3>
+                    </div>
+                </div>
+                <span class="px-2.5 py-1 text-[10px] font-bold rounded-lg"
+                    :class="props.myShift ? (props.myShift.shift_id ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700') : 'bg-amber-100 text-amber-700'">
+                    {{ props.myShift ? (props.myShift.shift_id ? 'Masuk' : 'Libur') : 'Pending' }}
+                </span>
+            </div>
+
             <!-- HERO CARD BIRU MOBILE -->
             <div
                 v-if="hasPermission('create attendance')"
