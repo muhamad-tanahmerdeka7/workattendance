@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AttendanceLogController; // <-- TAMBAHAN UNTUK LOG MESIN & GPS
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
@@ -53,6 +54,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/leave', [LeaveRequestController::class, 'store'])
         ->middleware('permission:create leave request')
         ->name('leave.store');
+
+    // 2c. Modul Log Mesin & GPS (Fitur Baru - Otentikasi Terbuka untuk Semua Pengguna Login)
+    Route::get('/attendance-logs', [AttendanceLogController::class, 'index'])
+        ->name('attendance.logs.index');
 
     // 3. Modul Lembur (Pengajuan)
     Route::get('/overtime', [OvertimeRequestController::class, 'index'])

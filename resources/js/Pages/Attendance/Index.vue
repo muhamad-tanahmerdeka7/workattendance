@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import { Head, useForm, usePage } from "@inertiajs/vue3";
 import { usePermission } from "@/Composables/usePermission";
+import { ref } from "vue";
 
 const props = defineProps({
     todayAttendance: Object,
@@ -12,15 +13,68 @@ const props = defineProps({
 const user = usePage().props.auth.user;
 const { hasPermission } = usePermission();
 
-const formCheckIn = useForm({ notes: "" });
-const formCheckOut = useForm({});
+// State loading saat sedang melacak sinyal GPS
+const isLocating = ref(false);
 
-const submitCheckIn = () => {
-    formCheckIn.post(route("attendance.checkIn"));
+// Form presensi dengan atribut koordinat
+const formCheckIn = useForm({
+    notes: "",
+    latitude: null,
+    longitude: null,
+});
+
+const formCheckOut = useForm({
+    latitude: null,
+    longitude: null,
+});
+
+// Helper untuk membaca GPS dari browser/HP
+const getCoordinates = (onSuccess) => {
+    if (!navigator.geolocation) {
+        alert("Browser atau perangkat Anda tidak mendukung geolokasi GPS.");
+        return;
+    }
+
+    isLocating.value = true;
+
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            isLocating.value = false;
+            onSuccess(position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+            isLocating.value = false;
+            let pesan = "Gagal membaca lokasi GPS.";
+            if (error.code === 1) pesan = "Izin akses lokasi ditolak oleh browser/sistem.";
+            else if (error.code === 2) pesan = "Posisi perangkat tidak dapat dideteksi.";
+            else if (error.code === 3) pesan = "Waktu pencarian sinyal lokasi habis (Timeout).";
+
+            alert(pesan);
+        },
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+        }
+    );
 };
 
+// Ambil lokasi sebelum mengirim Check-In
+const submitCheckIn = () => {
+    getCoordinates((lat, lng) => {
+        formCheckIn.latitude = lat;
+        formCheckIn.longitude = lng;
+        formCheckIn.post(route("attendance.checkIn"));
+    });
+};
+
+// Ambil lokasi sebelum mengirim Check-Out
 const submitCheckOut = () => {
-    formCheckOut.post(route("attendance.checkOut"));
+    getCoordinates((lat, lng) => {
+        formCheckOut.latitude = lat;
+        formCheckOut.longitude = lng;
+        formCheckOut.post(route("attendance.checkOut"));
+    });
 };
 </script>
 
@@ -97,10 +151,11 @@ const submitCheckOut = () => {
                             />
                             <button
                                 type="submit"
-                                :disabled="formCheckIn.processing"
-                                class="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 transition"
+                                :disabled="formCheckIn.processing || isLocating"
+                                class="w-full bg-blue-600 text-white py-2 rounded-md font-medium hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                Absen Masuk
+                                <span v-if="isLocating">Mencari Sinyal GPS...</span>
+                                <span v-else>Absen Masuk</span>
                             </button>
                         </form>
                         <span
@@ -127,10 +182,11 @@ const submitCheckOut = () => {
                         >
                             <button
                                 type="submit"
-                                :disabled="formCheckOut.processing"
-                                class="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 transition"
+                                :disabled="formCheckOut.processing || isLocating"
+                                class="w-full bg-red-600 text-white py-2 rounded-md font-medium hover:bg-red-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
                             >
-                                Absen Pulang
+                                <span v-if="isLocating">Mencari Sinyal GPS...</span>
+                                <span v-else>Absen Pulang</span>
                             </button>
                         </form>
                         <span
@@ -305,10 +361,11 @@ const submitCheckOut = () => {
                             />
                             <button
                                 type="submit"
-                                :disabled="formCheckIn.processing"
+                                :disabled="formCheckIn.processing || isLocating"
                                 class="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                             >
-                                <span>Absen Masuk</span>
+                                <span v-if="isLocating">Mencari Sinyal GPS...</span>
+                                <span v-else>Absen Masuk</span>
                             </button>
                         </form>
 
@@ -318,10 +375,11 @@ const submitCheckOut = () => {
                         >
                             <button
                                 type="submit"
-                                :disabled="formCheckOut.processing"
+                                :disabled="formCheckOut.processing || isLocating"
                                 class="w-full bg-red-600 hover:bg-red-700 active:scale-95 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                             >
-                                <span>Absen Pulang</span>
+                                <span v-if="isLocating">Mencari Sinyal GPS...</span>
+                                <span v-else>Absen Pulang</span>
                             </button>
                         </form>
 

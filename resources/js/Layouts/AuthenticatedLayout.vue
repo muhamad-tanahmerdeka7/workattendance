@@ -227,10 +227,10 @@ const isRouteActive = (pattern) => {
                     </NavLink>
 
                     <!-- Log Absensi Mesin / GPS (BARU) -->
+                    <!-- Log Mesin & GPS -->
                     <NavLink
-                        v-if="hasPermission('view all attendance')"
-                        :href="safeRoute('attendance.logs')"
-                        :active="isRouteActive('attendance.logs')"
+                        href="/attendance-logs"
+                        :active="$page.url.startsWith('/attendance-logs')"
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Log Mesin & GPS"
                     >
@@ -240,7 +240,6 @@ const isRouteActive = (pattern) => {
                         </svg>
                         <span v-if="showingSidebar" class="whitespace-nowrap">Log Mesin & GPS</span>
                     </NavLink>
-
                     <!-- Monitoring Gaji -->
                     <NavLink
                         :href="safeRoute('salaries.index')"
