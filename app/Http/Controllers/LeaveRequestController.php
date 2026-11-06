@@ -13,25 +13,28 @@ class LeaveRequestController extends Controller
     {
         $user = $request->user();
 
-        // Jika Line Head, tampilkan semua pengajuan dari bawahannya (termasuk dirinya)
-        if ($user->can('approve leave request') || $user->hasRole('Line Head')) {
+        // 1. Cek hak akses HR Manager / Super Admin
+        $isHrAdmin = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Super Admin', 'Admin'])
+            || $user->can('manage employees');
+
+        $query = LeaveRequest::with(['user', 'approver'])->latest();
+
+        if ($isHrAdmin) {
+            // HR Manager / Admin melihat SELURUH pengajuan dari semua karyawan
+        } elseif ($user->hasRole('Line Head') || $user->can('approve leave request')) {
+            // Line Head hanya melihat bawahannya dan pengajuan miliknya sendiri
             $teamUserIds = User::where('line_head_id', $user->id)->pluck('id');
             $allIds = $teamUserIds->push($user->id);
-
-            $leaveRequests = LeaveRequest::with(['user', 'approver'])
-                ->whereIn('user_id', $allIds)
-                ->latest()
-                ->get();
+            $query->whereIn('user_id', $allIds);
         } else {
-            // Jika Karyawan Biasa, hanya tampilkan pengajuan miliknya sendiri
-            $leaveRequests = LeaveRequest::with(['user', 'approver'])
-                ->where('user_id', $user->id)
-                ->latest()
-                ->get();
+            // Karyawan biasa hanya melihat pengajuan miliknya sendiri
+            $query->where('user_id', $user->id);
         }
 
         return Inertia::render('Leave/Index', [
-            'leaveRequests' => $leaveRequests,
+            'leaveRequests' => $query->get(),
+            'isApprover' => $isHrAdmin || $user->hasRole('Line Head') || $user->can('approve leave request'),
         ]);
     }
 
@@ -65,8 +68,14 @@ class LeaveRequestController extends Controller
 
     public function approve(Request $request, $id)
     {
-        // Proteksi otorisasi agar hanya atasan yang dapat menyetujui
-        if (! $request->user()->can('approve leave request') && ! $request->user()->hasRole('Line Head')) {
+        $user = $request->user();
+
+        $isHrAdmin = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Super Admin', 'Admin'])
+            || $user->can('manage employees');
+
+        // Proteksi otorisasi agar hanya atasan atau HR Manager yang dapat menyetujui
+        if (! $isHrAdmin && ! $user->can('approve leave request') && ! $user->hasRole('Line Head')) {
             abort(403, 'Anda tidak memiliki hak akses untuk menyetujui pengajuan ini.');
         }
 
@@ -74,16 +83,22 @@ class LeaveRequestController extends Controller
 
         $leaveRequest->update([
             'status' => 'approved',
-            'approved_by' => $request->user()->id,
+            'approved_by' => $user->id,
         ]);
 
         return redirect()->back()->with('success', 'Pengajuan berhasil disetujui.');
     }
 
-    // Penambahan fungsi reject yang sebelumnya belum ada
+    // Fungsi reject
     public function reject(Request $request, $id)
     {
-        if (! $request->user()->can('approve leave request') && ! $request->user()->hasRole('Line Head')) {
+        $user = $request->user();
+
+        $isHrAdmin = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Super Admin', 'Admin'])
+            || $user->can('manage employees');
+
+        if (! $isHrAdmin && ! $user->can('approve leave request') && ! $user->hasRole('Line Head')) {
             abort(403, 'Anda tidak memiliki hak akses untuk menolak pengajuan ini.');
         }
 
@@ -95,7 +110,7 @@ class LeaveRequestController extends Controller
 
         $leaveRequest->update([
             'status' => 'rejected',
-            'approved_by' => $request->user()->id,
+            'approved_by' => $user->id,
             'rejection_note' => $validated['rejection_note'],
         ]);
 
@@ -125,15 +140,24 @@ class LeaveRequestController extends Controller
     {
         $user = $request->user();
 
+        // 1. Cek hak akses HR Manager / Super Admin
+        $isHrAdmin = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Super Admin', 'Admin'])
+            || $user->can('manage employees');
+
         $query = LeaveRequest::with(['user', 'approver'])
             ->whereIn('type', $types)
             ->latest();
 
-        if ($user->can('approve leave request') || $user->hasRole('Line Head')) {
+        if ($isHrAdmin) {
+            // HR Manager / Admin dapat melihat SEMUA pengajuan tanpa batasan line_head_id
+        } elseif ($user->hasRole('Line Head') || $user->can('approve leave request')) {
+            // Line Head hanya melihat pengajuan dari bawahan langsung dan dirinya sendiri
             $teamUserIds = User::where('line_head_id', $user->id)->pluck('id');
             $allIds = $teamUserIds->push($user->id);
             $query->whereIn('user_id', $allIds);
         } else {
+            // Karyawan biasa hanya melihat pengajuan miliknya
             $query->where('user_id', $user->id);
         }
 
@@ -141,7 +165,7 @@ class LeaveRequestController extends Controller
             'leaveRequests' => $query->get(),
             'pageTitle' => $pageTitle,
             'allowedTypes' => $types,
-            'isApprover' => $user->can('approve leave request') || $user->hasRole('Line Head'),
+            'isApprover' => $isHrAdmin || $user->hasRole('Line Head') || $user->can('approve leave request'),
         ]);
     }
 }

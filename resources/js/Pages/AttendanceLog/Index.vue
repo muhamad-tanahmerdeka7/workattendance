@@ -214,14 +214,14 @@ const saveLocation = () => {
                         <tbody class="divide-y divide-gray-100">
                             <tr v-for="item in props.logs?.data || []" :key="item.id" class="hover:bg-gray-50">
                                 <td class="p-3 font-mono text-xs text-gray-700">
-                                    {{ new Date(item.scanned_at).toLocaleString('id-ID') }}
+                                    {{ item.scanned_at ? new Date(item.scanned_at).toLocaleString('id-ID') : '-' }}
                                 </td>
                                 <td class="p-3">
                                     <p class="font-medium text-gray-800">{{ item.user?.name || '-' }}</p>
                                     <p class="text-xs text-gray-400">{{ item.nik || '-' }}</p>
                                 </td>
                                 <td class="p-3 uppercase font-bold text-xs">
-                                    <span :class="item.scan_type === 'in' ? 'text-blue-600' : 'text-orange-600'">
+                                    <span :class="item.scan_type?.toLowerCase() === 'in' ? 'text-blue-600' : 'text-orange-600'">
                                         {{ item.scan_type }}
                                     </span>
                                 </td>
@@ -233,7 +233,7 @@ const saveLocation = () => {
                                         {{ item.source_type === 'machine' ? 'Mesin Fisik' : 'GPS Mobile' }}
                                     </span>
                                 </td>
-                                <td class="p-3 text-xs text-gray-600">
+                                <td class="p-3 text-xs text-gray-600 max-w-[180px] truncate" :title="item.device_name">
                                     {{ item.device_name || '-' }}
                                 </td>
                                 <td class="p-3 text-xs text-gray-600">
@@ -276,7 +276,7 @@ const saveLocation = () => {
                         <div class="flex justify-between items-start">
                             <div>
                                 <p class="text-xs font-bold text-gray-800">{{ item.user?.name || '-' }}</p>
-                                <p class="text-[10px] text-gray-400 font-mono">{{ new Date(item.scanned_at).toLocaleString('id-ID') }}</p>
+                                <p class="text-[10px] text-gray-400 font-mono">{{ item.scanned_at ? new Date(item.scanned_at).toLocaleString('id-ID') : '-' }}</p>
                             </div>
                             <span
                                 :class="item.source_type === 'machine' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'"

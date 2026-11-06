@@ -28,7 +28,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            // Dibuat string saja tanpa rule 'email' agar NIK dapat diterima
+            'email' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,7 +43,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $input = $this->input('email');
+
+        // Deteksi apakah input berupa format email atau NIK
+        $fieldType = filter_var($input, FILTER_VALIDATE_EMAIL) ? 'email' : 'nik';
+
+        $credentials = [
+            $fieldType => $input,
+            'password'  => $this->input('password'),
+        ];
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

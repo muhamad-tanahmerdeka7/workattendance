@@ -33,9 +33,18 @@ class AttendanceLog extends Model
         'distance_meters' => 'float',
     ];
 
-    /**
-     * Relasi ke data pengguna / karyawan
-     */
+    protected static function booted(): void
+    {
+        static::creating(function ($log) {
+            if (empty($log->nik) && !empty($log->user_id)) {
+                $user = User::find($log->user_id);
+                if ($user && !empty($user->nik)) {
+                    $log->nik = $user->nik;
+                }
+            }
+        });
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

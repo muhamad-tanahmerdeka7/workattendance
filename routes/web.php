@@ -6,9 +6,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\OvertimeRequestController;
+use App\Http\Controllers\ProductController;       // <-- TAMBAHAN UNTUK MODUL PRODUK & BOM
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RawMaterialController;   // <-- TAMBAHAN UNTUK KATALOG BAHAN BAKU
 use App\Http\Controllers\SalaryController;
-use App\Http\Controllers\ShiftController; // <-- TAMBAHAN UNTUK MODUL SHIFT KERJA
+use App\Http\Controllers\ShiftController;         // <-- TAMBAHAN UNTUK MODUL SHIFT KERJA
 use Illuminate\Support\Facades\Route;
 
 // Mengarahkan domain utama langsung ke halaman Login
@@ -58,6 +60,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // 2c. Modul Log Mesin & GPS (Fitur Baru - Otentikasi Terbuka untuk Semua Pengguna Login)
     Route::get('/attendance-logs', [AttendanceLogController::class, 'index'])
         ->name('attendance.logs.index');
+
+    Route::post('/attendance-logs/location', [AttendanceLogController::class, 'updateLocation'])
+        ->name('attendance.logs.updateLocation');
 
     // 3. Modul Lembur (Pengajuan)
     Route::get('/overtime', [OvertimeRequestController::class, 'index'])
@@ -115,6 +120,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/shifts/schedule', [ShiftController::class, 'schedule'])->name('shifts.schedule');
     Route::get('/shifts/schedule/export', [ShiftController::class, 'exportSchedule'])->name('shifts.schedule.export');
     Route::get('/shifts/schedule/export-pdf', [ShiftController::class, 'exportSchedulePdf'])->name('shifts.schedule.exportPdf');
+
+    // ==========================================
+    // MODUL INVENTORI & RESEP PRODUK (KITCHEN)
+    // ==========================================
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+    Route::get('/raw-materials', [RawMaterialController::class, 'index'])->name('raw-materials.index');
+    Route::post('/raw-materials', [RawMaterialController::class, 'store'])->name('raw-materials.store');
+    Route::match(['put', 'patch'], '/raw-materials/{rawMaterial}', [RawMaterialController::class, 'update'])->name('raw-materials.update');
+    Route::delete('/raw-materials/{rawMaterial}', [RawMaterialController::class, 'destroy'])->name('raw-materials.destroy');
+    Route::post('/raw-materials/{id}/add-stock', [RawMaterialController::class, 'addStock'])->name('raw-materials.add-stock'); // <-- TAMBAHAN ROUTE UNTUK STOK MASUK
 });
 
 // Group Route Profil bawaan Laravel Breeze

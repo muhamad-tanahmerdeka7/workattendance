@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\AttendanceLog;
-use App\Models\CompanySetting; // Atau model pengaturan koordinat kantor yang Anda gunakan
+use App\Models\CompanyLocation;
+use App\Models\CompanySetting;
 use App\Models\EmployeeShift;
 use App\Models\Shift;
 use Carbon\Carbon;
@@ -132,29 +133,29 @@ class AttendanceController extends Controller
         $lat = $request->latitude;
         $lng = $request->longitude;
         $distance = null;
-        $statusRadius = null;
+        $isInRadius = false;
 
-        // Ambil konfigurasi lokasi kantor dari database
-        // Sesuaikan dengan model/setting yang Anda pakai (misal: -6.312356, 106.881287, radius 50m)
-        $officeLat = -6.312356;
-        $officeLng = 106.881287;
-        $maxRadius = 50; // dalam meter
+        // Ambil konfigurasi lokasi kantor dari database jika ada
+        $companyLocation = CompanyLocation::first();
+        $officeLat = $companyLocation ? (float) $companyLocation->latitude : -6.308912;
+        $officeLng = $companyLocation ? (float) $companyLocation->longitude : 106.878411;
+        $maxRadius = $companyLocation ? (int) $companyLocation->radius_meters : 50;
 
         if ($lat && $lng) {
-            $distance = $this->calculateHaversineDistance($officeLat, $officeLng, $lat, $lng);
-            $statusRadius = ($distance <= $maxRadius) ? 'Di Dalam Radius' : 'Luar Radius';
+            $distance = $this->calculateHaversineDistance($officeLat, $officeLng, (float) $lat, (float) $lng);
+            $isInRadius = ($distance <= $maxRadius);
         }
 
         AttendanceLog::create([
-            'user_id' => $userId,
-            'attendance_time' => Carbon::now(),
-            'type' => $type,
-            'source' => 'GPS Mobile',
-            'device' => $request->header('User-Agent', 'Web Browser'),
-            'latitude' => $lat,
-            'longitude' => $lng,
-            'distance' => $distance ? round($distance) : null,
-            'status' => $statusRadius,
+            'user_id'         => $userId,
+            'scanned_at'      => Carbon::now(),
+            'scan_type'       => $type,
+            'source_type'     => 'gps',
+            'device_name'     => $request->header('User-Agent', 'Web Browser'),
+            'latitude'        => $lat,
+            'longitude'       => $lng,
+            'distance_meters' => $distance ? round($distance, 2) : null,
+            'is_in_radius'    => $isInRadius,
         ]);
     }
 

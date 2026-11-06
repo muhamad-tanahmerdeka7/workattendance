@@ -75,24 +75,24 @@ const submit = () => {
 
                 <form @submit.prevent="submit" class="space-y-4">
 
-                    <!-- INPUT EMAIL -->
+                    <!-- INPUT NIK ATAU EMAIL -->
                     <div>
-                        <InputLabel for="email" value="Email / Username" class="text-xs font-bold text-slate-700 mb-1" />
+                        <InputLabel for="email" value="NIK atau Email" class="text-xs font-bold text-slate-700 mb-1" />
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                             </div>
                             <TextInput
                                 id="email"
-                                type="email"
+                                type="text"
                                 class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border-slate-200 focus:border-blue-500 focus:ring-blue-500 bg-slate-50/50"
                                 v-model="form.email"
                                 required
                                 autofocus
                                 autocomplete="username"
-                                placeholder="nama@perusahaan.com"
+                                placeholder="Masukkan NIK atau email@perusahaan.com"
                             />
                         </div>
                         <InputError class="mt-1" :message="form.errors.email" />
@@ -131,7 +131,7 @@ const submit = () => {
                                 </svg>
                             </button>
                         </div>
-                        <InputError class="mt-1" :message="form.errors.password" />
+                        <InputError class="mt-1" :message="form.errors.email" />
                     </div>
 
                     <!-- REMEMBER ME & LUPA PASSWORD -->

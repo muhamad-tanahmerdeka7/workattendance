@@ -16,13 +16,21 @@ class AttendanceLogController extends Controller
 
         $query = AttendanceLog::with('user')->latest('scanned_at');
 
-        // Jika Line Head atau memiliki permission approval, tampilkan tim dan dirinya sendiri
-        if ($user->can('approve leave request') || $user->hasRole('Line Head')) {
+        // Cek hak akses Manager / Super Admin / HR Manager
+        $isManager = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Manager', 'Admin', 'Super Admin'])
+            || $user->can('manage employees')
+            || $user->can('view all attendance');
+
+        if ($isManager) {
+            // HR Manager / Admin dapat melihat SELURUH log presensi semua karyawan
+        } elseif ($user->hasRole('Line Head') || $user->can('approve leave request')) {
+            // Line Head hanya melihat bawahannya dan dirinya sendiri
             $teamUserIds = User::where('line_head_id', $user->id)->pluck('id');
             $allIds = $teamUserIds->push($user->id);
             $query->whereIn('user_id', $allIds);
         } else {
-            // Karyawan biasa hanya melihat riwayat log miliknya
+            // Karyawan biasa hanya melihat log miliknya
             $query->where('user_id', $user->id);
         }
 
@@ -31,15 +39,12 @@ class AttendanceLogController extends Controller
             $query->whereDate('scanned_at', $request->date);
         }
 
-        // Filter sumber data: 'machine' (mesin fisik) atau 'gps' (ponsel/web)
+        // Filter sumber data
         if ($request->filled('source_type')) {
             $query->where('source_type', $request->source_type);
         }
 
-        // Cek hak akses Manager (bisa lewat email spesifik, role Manager, atau role Admin)
-        $isManager = ($user->email === 'muhamad@gmail.com') || $user->hasRole(['Manager', 'Admin']);
-
-        // Ambil data titik lokasi kerja saat ini (atau buat default jika belum ada)
+        // Ambil konfigurasi titik lokasi kantor
         $companyLocation = CompanyLocation::firstOrCreate(
             ['id' => 1],
             [
@@ -59,15 +64,14 @@ class AttendanceLogController extends Controller
         ]);
     }
 
-    /**
-     * Method untuk menyimpan titik lokasi dan radius baru oleh Manager
-     */
     public function updateLocation(Request $request)
     {
         $user = $request->user();
 
-        // Otorisasi ketat
-        if ($user->email !== 'muhamad@gmail.com' && !$user->hasRole(['Manager', 'Admin'])) {
+        $isManager = ($user->email === 'muhamad@gmail.com')
+            || $user->hasRole(['HR Manager', 'Manager', 'Admin', 'Super Admin']);
+
+        if (!$isManager) {
             abort(403, 'Hanya Manager yang dapat mengubah titik koordinat lokasi kerja.');
         }
 

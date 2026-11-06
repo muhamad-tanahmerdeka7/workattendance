@@ -74,7 +74,8 @@ class RoleAndPermissionSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['email' => 'muhamad@gmail.com'],
             [
-                'name' => 'Muhamad S.Kom',
+                'nik'      => 'HR001',
+                'name'     => 'Muhamad S.Kom',
                 'password' => bcrypt('password'),
             ]
         );
@@ -84,7 +85,8 @@ class RoleAndPermissionSeeder extends Seeder
         $head = User::updateOrCreate(
             ['email' => 'head@example.com'],
             [
-                'name' => 'Line Head Demo',
+                'nik'      => 'HEAD001',
+                'name'     => 'Line Head Demo',
                 'password' => bcrypt('password'),
             ]
         );
@@ -94,8 +96,9 @@ class RoleAndPermissionSeeder extends Seeder
         $karyawan = User::updateOrCreate(
             ['email' => 'karyawan@example.com'],
             [
-                'name' => 'Karyawan Demo',
-                'password' => bcrypt('password'),
+                'nik'          => 'EMP001',
+                'name'         => 'Karyawan Demo',
+                'password'     => bcrypt('password'),
                 'line_head_id' => $head->id,
             ]
         );

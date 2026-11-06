@@ -267,76 +267,89 @@ const isRouteActive = (pattern) => {
                         <span v-if="showingSidebar" class="whitespace-nowrap">Kelola Karyawan</span>
                     </NavLink>
 
-                    <!-- ================= INVENTORI & GUDANG (BARU) ================= -->
-                    <div v-if="showingSidebar" class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider uppercase text-slate-400">
-                        Inventori & Bahan Baku
-                    </div>
-                    <div v-else class="my-2 border-t border-slate-100"></div>
+                   <!-- ================= INVENTORI & GUDANG (BARU) ================= -->
+<div v-if="showingSidebar" class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider uppercase text-slate-400">
+    Inventori & Bahan Baku
+</div>
+<div v-else class="my-2 border-t border-slate-100"></div>
 
-                    <!-- Katalog Bahan Baku -->
-                    <NavLink
-                        :href="safeRoute('materials.index')"
-                        :active="isRouteActive('materials.*')"
-                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
-                        title="Katalog Bahan Baku"
-                    >
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                        </svg>
-                        <span v-if="showingSidebar" class="whitespace-nowrap">Katalog Bahan Baku</span>
-                    </NavLink>
+<!-- 1. List Produk (Finish Good & BOM) -->
+<NavLink
+    :href="safeRoute('products.index')"
+    :active="isRouteActive('products.*')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="List Produk & Resep"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">List Produk</span>
+</NavLink>
 
-                    <!-- Stok & Lokasi Rak -->
-                    <NavLink
-                        :href="safeRoute('inventory.stocks')"
-                        :active="isRouteActive('inventory.stocks')"
-                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
-                        title="Stok & Lokasi Rak"
-                    >
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        <span v-if="showingSidebar" class="whitespace-nowrap">Stok & Lokasi Rak</span>
-                    </NavLink>
+<!-- 2. Katalog Bahan Baku -->
+<NavLink
+    :href="safeRoute('raw-materials.index')"
+    :active="isRouteActive('raw-materials.*')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="Katalog Bahan Baku"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">Katalog Bahan Baku</span>
+</NavLink>
 
-                    <!-- Bahan Masuk (Inbound) -->
-                    <NavLink
-                        :href="safeRoute('inventory.inbound')"
-                        :active="isRouteActive('inventory.inbound')"
-                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
-                        title="Bahan Masuk (Inbound)"
-                    >
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                        </svg>
-                        <span v-if="showingSidebar" class="whitespace-nowrap">Bahan Masuk</span>
-                    </NavLink>
+<!-- 3. Stok & Lokasi Rak -->
+<NavLink
+    :href="safeRoute('inventory.stocks')"
+    :active="isRouteActive('inventory.stocks')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="Stok & Lokasi Rak"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">Stok & Lokasi Rak</span>
+</NavLink>
 
-                    <!-- Bahan Keluar / Produksi (Outbound) -->
-                    <NavLink
-                        :href="safeRoute('inventory.outbound')"
-                        :active="isRouteActive('inventory.outbound')"
-                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
-                        title="Bahan Keluar / Produksi"
-                    >
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-                        </svg>
-                        <span v-if="showingSidebar" class="whitespace-nowrap">Bahan Keluar / Produksi</span>
-                    </NavLink>
+<!-- 4. Bahan Masuk (Inbound) -->
+<NavLink
+    :href="safeRoute('inventory.inbound')"
+    :active="isRouteActive('inventory.inbound')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="Bahan Masuk (Inbound)"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">Bahan Masuk</span>
+</NavLink>
 
-                    <!-- Stock Opname -->
-                    <NavLink
-                        :href="safeRoute('inventory.opname')"
-                        :active="isRouteActive('inventory.opname')"
-                        class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
-                        title="Stock Opname"
-                    >
-                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                        </svg>
-                        <span v-if="showingSidebar" class="whitespace-nowrap">Stock Opname</span>
-                    </NavLink>
+<!-- 5. Bahan Keluar / Produksi (Outbound) -->
+<NavLink
+    :href="safeRoute('inventory.outbound')"
+    :active="isRouteActive('inventory.outbound')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="Bahan Keluar / Produksi"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">Bahan Keluar / Produksi</span>
+</NavLink>
+
+<!-- 6. Stock Opname -->
+<NavLink
+    :href="safeRoute('inventory.opname')"
+    :active="isRouteActive('inventory.opname')"
+    class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
+    title="Stock Opname"
+>
+    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+    </svg>
+    <span v-if="showingSidebar" class="whitespace-nowrap">Stock Opname</span>
+</NavLink>
 
                     <!-- ================= ORDER & PENGADAAN (BARU) ================= -->
                     <div v-if="showingSidebar" class="px-3 pt-4 pb-1 text-[10px] font-bold tracking-wider uppercase text-slate-400">
