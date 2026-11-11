@@ -4,14 +4,16 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceLogController; // <-- TAMBAHAN UNTUK LOG MESIN & GPS
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\InboundLogController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\OvertimeRequestController;
-use App\Http\Controllers\ProductController;       // <-- TAMBAHAN UNTUK MODUL PRODUK & BOM
+use App\Http\Controllers\ProductController;      // <-- TAMBAHAN UNTUK MODUL PRODUK & BOM
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RawMaterialController;   // <-- TAMBAHAN UNTUK KATALOG BAHAN BAKU
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\ShiftController;         // <-- TAMBAHAN UNTUK MODUL SHIFT KERJA
 use Illuminate\Support\Facades\Route;
+
 
 // Mengarahkan domain utama langsung ke halaman Login
 Route::get('/', function () {
@@ -125,6 +127,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // MODUL INVENTORI & RESEP PRODUK (KITCHEN)
     // ==========================================
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}/export-pdf', [ProductController::class, 'exportPdf'])->name('products.exportPdf'); // <-- TAMBAHAN RUTE EKSPOR PDF PRODUK
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
     Route::match(['put', 'patch'], '/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
@@ -134,7 +137,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::match(['put', 'patch'], '/raw-materials/{rawMaterial}', [RawMaterialController::class, 'update'])->name('raw-materials.update');
     Route::delete('/raw-materials/{rawMaterial}', [RawMaterialController::class, 'destroy'])->name('raw-materials.destroy');
     Route::post('/raw-materials/{id}/add-stock', [RawMaterialController::class, 'addStock'])->name('raw-materials.add-stock'); // <-- TAMBAHAN ROUTE UNTUK STOK MASUK
-});
+
+    // ==========================================
+    // LAPORAN LOGISTIK (INBOUND / BARANG MASUK) - DIPINDAHKAN KE DALAM GROUP
+    // ==========================================
+    Route::get('/inbounds', [InboundLogController::class, 'index'])->name('inbounds.index');
+
+}); // <-- KURUNG PENUTUP DIPINDAHKAN KE SINI
 
 // Group Route Profil bawaan Laravel Breeze
 Route::middleware('auth')->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductRecipe;
 use App\Models\RawMaterial;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -150,5 +151,15 @@ class ProductController extends Controller
         });
 
         return back()->with('success', 'Produk beserta resep BOM berhasil dihapus.');
+    }
+
+    public function exportPdf(Product $product)
+    {
+        $product->load(['recipes.rawMaterial']);
+
+        $pdf = Pdf::loadView('products.pdf', compact('product'));
+
+        // Menggunakan stream() agar memunculkan preview dokumen PDF di tab baru browser
+        return $pdf->stream('Form-Standar-Resep-'.$product->item_code.'.pdf');
     }
 }
