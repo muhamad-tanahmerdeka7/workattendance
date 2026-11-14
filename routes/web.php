@@ -5,9 +5,10 @@ use App\Http\Controllers\AttendanceLogController; // <-- TAMBAHAN UNTUK LOG MESI
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InboundLogController;
+use App\Http\Controllers\OutboundLogController;   // <-- TAMBAHAN UNTUK MODUL BAHAN KELUAR / PRODUKSI
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\OvertimeRequestController;
-use App\Http\Controllers\ProductController;      // <-- TAMBAHAN UNTUK MODUL PRODUK & BOM
+use App\Http\Controllers\ProductController;       // <-- TAMBAHAN UNTUK MODUL PRODUK & BOM
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RawMaterialController;   // <-- TAMBAHAN UNTUK KATALOG BAHAN BAKU
 use App\Http\Controllers\SalaryController;
@@ -139,9 +140,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/raw-materials/{id}/add-stock', [RawMaterialController::class, 'addStock'])->name('raw-materials.add-stock'); // <-- TAMBAHAN ROUTE UNTUK STOK MASUK
 
     // ==========================================
-    // LAPORAN LOGISTIK (INBOUND / BARANG MASUK) - DIPINDAHKAN KE DALAM GROUP
+    // LAPORAN LOGISTIK (INBOUND / BARANG MASUK)
     // ==========================================
     Route::get('/inbounds', [InboundLogController::class, 'index'])->name('inbounds.index');
+    Route::post('/inbounds', [InboundLogController::class, 'store'])->name('inbounds.store');
+
+    // ==========================================
+    // LAPORAN LOGISTIK (OUTBOUND / BAHAN KELUAR)
+    // ==========================================
+    Route::get('/outbounds', [OutboundLogController::class, 'index'])->name('outbounds.index');
+    Route::post('/outbounds', [OutboundLogController::class, 'store'])->name('outbounds.store');
+    Route::get('/outbounds/print-pdf', [App\Http\Controllers\OutboundLogController::class, 'printPdf'])->name('outbounds.print-pdf');
 
 }); // <-- KURUNG PENUTUP DIPINDAHKAN KE SINI
 

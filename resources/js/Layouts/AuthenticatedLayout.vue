@@ -141,7 +141,6 @@ const isRouteActive = (pattern) => {
                 </div>
 
                 <!-- Navigation Links Desktop (Scrollable) -->
-                <!-- PERBAIKAN: Menghapus id dan menambahkan scroll-region -->
                 <nav
                     scroll-region
                     class="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-200"
@@ -303,7 +302,7 @@ const isRouteActive = (pattern) => {
                     <!-- Lembur & Tukar Shift -->
                     <NavLink
                         :href="safeRoute('overtime.index')"
-                        :active="isRouteActive('overtime.*')"
+                        :active="isRouteActive('overtime.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Lembur & Tukar Shift"
@@ -355,7 +354,7 @@ const isRouteActive = (pattern) => {
                     <!-- Cuti & Dispensasi -->
                     <NavLink
                         :href="safeRoute('leave.dispensation.index')"
-                        :active="isRouteActive('leave.dispensation.*')"
+                        :active="isRouteActive('leave.dispensation.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Cuti & Dispensasi"
@@ -381,7 +380,7 @@ const isRouteActive = (pattern) => {
                     <!-- Log Mesin & GPS -->
                     <NavLink
                         :href="safeRoute('attendance.logs.index')"
-                        :active="isRouteActive('attendance.logs.*')"
+                        :active="isRouteActive('attendance.logs.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Log Mesin & GPS"
@@ -413,7 +412,7 @@ const isRouteActive = (pattern) => {
                     <!-- Monitoring Gaji -->
                     <NavLink
                         :href="safeRoute('salaries.index')"
-                        :active="isRouteActive('salaries.*')"
+                        :active="isRouteActive('salaries.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Monitoring Gaji"
@@ -440,7 +439,7 @@ const isRouteActive = (pattern) => {
                     <NavLink
                         v-if="hasPermission('manage employees')"
                         :href="safeRoute('employees.index')"
-                        :active="isRouteActive('employees.*')"
+                        :active="isRouteActive('employees.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Kelola Karyawan"
@@ -475,7 +474,7 @@ const isRouteActive = (pattern) => {
                     <!-- 1. List Produk -->
                     <NavLink
                         :href="safeRoute('products.index')"
-                        :active="isRouteActive('products.*')"
+                        :active="isRouteActive('products.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="List Produk & Resep"
@@ -501,7 +500,7 @@ const isRouteActive = (pattern) => {
                     <!-- 2. Katalog Bahan Baku -->
                     <NavLink
                         :href="safeRoute('raw-materials.index')"
-                        :active="isRouteActive('raw-materials.*')"
+                        :active="isRouteActive('raw-materials.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Katalog Bahan Baku"
@@ -553,7 +552,7 @@ const isRouteActive = (pattern) => {
                     <!-- 4. Bahan Masuk (Inbound) -->
                     <NavLink
                         :href="safeRoute('inbounds.index')"
-                        :active="isRouteActive('inbounds.*')"
+                        :active="isRouteActive('inbounds.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Bahan Masuk (Inbound)"
@@ -578,8 +577,8 @@ const isRouteActive = (pattern) => {
 
                     <!-- 5. Bahan Keluar / Produksi (Outbound) -->
                     <NavLink
-                        :href="safeRoute('inventory.outbound')"
-                        :active="isRouteActive('inventory.outbound')"
+                        :href="safeRoute('outbounds.index')"
+                        :active="isRouteActive('outbounds.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Bahan Keluar / Produksi"
@@ -640,7 +639,7 @@ const isRouteActive = (pattern) => {
                     <!-- Permintaan Pembelian (PR) -->
                     <NavLink
                         :href="safeRoute('purchase-requests.index')"
-                        :active="isRouteActive('purchase-requests.*')"
+                        :active="isRouteActive('purchase-requests.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Permintaan Beli (PR)"
@@ -666,7 +665,7 @@ const isRouteActive = (pattern) => {
                     <!-- Purchase Order (PO) -->
                     <NavLink
                         :href="safeRoute('purchase-orders.index')"
-                        :active="isRouteActive('purchase-orders.*')"
+                        :active="isRouteActive('purchase-orders.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Order Bahan Baku (PO)"
@@ -692,7 +691,7 @@ const isRouteActive = (pattern) => {
                     <!-- Data Supplier -->
                     <NavLink
                         :href="safeRoute('suppliers.index')"
-                        :active="isRouteActive('suppliers.*')"
+                        :active="isRouteActive('suppliers.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Data Pemasok / Vendor"
@@ -727,7 +726,7 @@ const isRouteActive = (pattern) => {
                     <!-- Laporan Terpadu -->
                     <NavLink
                         :href="safeRoute('reports.index')"
-                        :active="isRouteActive('reports.*')"
+                        :active="isRouteActive('reports.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Laporan Terpadu"
@@ -754,7 +753,7 @@ const isRouteActive = (pattern) => {
                     <NavLink
                         v-if="hasPermission('manage employees')"
                         :href="safeRoute('roles.index')"
-                        :active="isRouteActive('roles.*')"
+                        :active="isRouteActive('roles.index')"
                         preserve-scroll
                         class="flex items-center gap-3 px-3 py-2 text-sm font-medium transition rounded-xl"
                         title="Hak Akses & Role"
@@ -1003,7 +1002,7 @@ const isRouteActive = (pattern) => {
                                 :href="safeRoute('inbounds.index')"
                                 @click="showingMobileDrawer = false"
                                 :class="
-                                    isRouteActive('inbounds.*')
+                                    isRouteActive('inbounds.index')
                                         ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-200 shadow-sm'
                                         : 'bg-slate-50 text-slate-700'
                                 "
@@ -1011,10 +1010,16 @@ const isRouteActive = (pattern) => {
                             >
                                 <span>📥 Bahan Masuk</span>
                             </Link>
+                            <!-- 5. Bahan Keluar (Outbound) - HP (FIXED ROUTE) -->
                             <Link
-                                :href="safeRoute('inventory.outbound')"
+                                :href="safeRoute('outbounds.index')"
                                 @click="showingMobileDrawer = false"
-                                class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 text-xs font-medium text-slate-700"
+                                :class="
+                                    isRouteActive('outbounds.index')
+                                        ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-200 shadow-sm'
+                                        : 'bg-slate-50 text-slate-700'
+                                "
+                                class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-blue-50 text-xs font-medium transition"
                             >
                                 <span>📤 Bahan Keluar</span>
                             </Link>
@@ -1161,9 +1166,11 @@ const isRouteActive = (pattern) => {
             <Link
                 :href="safeRoute('raw-materials.index')"
                 :class="
-                    isRouteActive('raw-materials.*') ||
-                    isRouteActive('inbounds.*') ||
-                    isRouteActive('inventory.*')
+                    isRouteActive('raw-materials.index') ||
+                    isRouteActive('inbounds.index') ||
+                    isRouteActive('outbounds.index') ||
+                    isRouteActive('inventory.stocks') ||
+                    isRouteActive('inventory.opname')
                         ? 'text-blue-600 font-bold'
                         : 'text-slate-400'
                 "
